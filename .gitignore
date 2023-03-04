@@ -1,6 +1,5 @@
 settings.py
 *.log
-.vscode/
 .idea/
 .venv/
 .DS_Store

@@ -4,7 +4,8 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 import settings
 
-# создали переменную логер в логинге, теперь будем писать logger для каждого сообщения
+# создали переменную логер в логинге,
+# теперь будем писать logger для каждого сообщения
 logger = logging.getLogger(__name__)
 
 # посылка в консоль ошибок level=info - информационные сообщения filename='bot.log' - не работает
@@ -19,7 +20,7 @@ def greet_user(update, context):
 
 # text - переменная в которой текст сообщения, сохранили в логер, отзеркалили текст в телегу
 def talk_to_me(update, context):
-    text = update.message.text 
+    text = update.message.text
     logger.info(text)
     update.message.reply_text(text)
 
@@ -31,7 +32,8 @@ def main():
     dp = mybot.dispatcher
     dp.add_handler(CommandHandler("start", greet_user))
 
-    # MessageHandler - обработчик текстовых сообщений, Filters - фильтруем только текст, вызываем ф-ю
+    # MessageHandler - обработчик текстовых сообщений, Filters - фильтруем
+    # только текст, вызываем ф-ю
     dp.add_handler(MessageHandler(Filters.text, talk_to_me))
 
 
