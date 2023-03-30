@@ -1,51 +1,48 @@
-import logging
+
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-import settings
+from config import config
 
-# создали переменную логер в логинге,
-# теперь будем писать logger для каждого сообщения
+import logging
+
+import httpx
+import json
+from telegram.ext import Updater, CommandHandler
+from config import config
+from bot.api import api
+
 logger = logging.getLogger(__name__)
 
-# посылка в консоль ошибок level=info - информационные сообщения filename='bot.log' - не работает
+
 logging.basicConfig(level=logging.INFO)
 
-# update - инфа с Telegram. context - сообщения из функции отправляем Папе
-def greet_user(update, context):
+
+def start(update, context):
     logger.info('Вызван /start')
 
-    # message.reply_text - Ответим пользователю на его сообщение
-    update.message.reply_text('Привет, пользователь!')
-
-# text - переменная в которой текст сообщения, сохранили в логер, отзеркалили текст в телегу
-def talk_to_me(update, context):
-    text = update.message.text
-    logger.info(text)
-    update.message.reply_text(text)
+    user = update.effective_user
+    username = user.username
+    tgid = user.id
+    first_name = user.first_name
+    last_name = user.last_name
+    chat_id = update.message.chat_id
+    context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=f'Hello, {username}!, {tgid} - {first_name}, {last_name}, {chat_id}'
+    )
+    # registrate(username, tgid)
+    api.users.registrate(username=username, tgid=tgid)
+    #api.categories.get_by_name(title=title)
 
 def main():
-    # Создаем бота и передаем ему ключ для авторизации на серверах Telegram
-    mybot = Updater(settings.API_KEY, use_context=True)
 
-    # Создаем переменную dp, вызываем обработчик команды start, обращаемся к функции greet user
-    dp = mybot.dispatcher
-    dp.add_handler(CommandHandler("start", greet_user))
-
-    # MessageHandler - обработчик текстовых сообщений, Filters - фильтруем
-    # только текст, вызываем ф-ю
-    dp.add_handler(MessageHandler(Filters.text, talk_to_me))
+    updater = Updater(token=config.api_key, use_context=True)
+    dispatcher = updater.dispatcher
+    start_handler = CommandHandler('start', start)
+    dispatcher.add_handler(start_handler)
+    updater.start_polling()
 
 
-    #Залогируем в файл информацию о старте бота
-    logger.info("Бот стартовал")
-
-    # Командуем боту начать ходить в Telegram за сообщениями
-    mybot.start_polling()
-
-    # Запускаем бота, он будет работать, пока мы его не остановим принудительно
-    mybot.idle()
-
-# Экранируем вызов main()
 if __name__ == "__main__":
     main()
