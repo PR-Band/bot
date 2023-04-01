@@ -11,8 +11,11 @@ class UserClient:
         data = {'tgid': tgid, 'username': username}
         # if
         response = httpx.post(self.url, json=data)
-        response.raise_for_status()
 
+        #if httpx.HTTPStatusError:
+
+
+        response.raise_for_status()
 
 
 class ApiClient:
@@ -20,5 +23,6 @@ class ApiClient:
     def __init__(self, url: str):
 
         self.users = UserClient(url=url)
+
 
 api = ApiClient(url='http://127.0.0.1:8000')
