@@ -34,23 +34,11 @@ def get_categories():
     logger.info(response.text)
     return response.json()
 
-def get_category_by_name(name: str):
-    categories = get_categories()
-    names = []
-    for category in categories:
-        if name in category['title']:
-            names.append(category['title'])
-    # счетчик неймов
-    if len(names) > 1:
-        response = httpx.get('http://127.0.0.1:8000/api/v1/categories/')
-        logger.info(response.status_code)
-        logger.info(response.text)
-        return response.json()
-    else:
-        response = httpx.get('http://127.0.0.1:8000/api/v1/categories/',params={'title': name})
-        logger.info(response.status_code)
-        logger.info(response.text)
-        return response.json()
+def get_categories_by_name(name: str):
+    response = httpx.get('http://127.0.0.1:8000/api/v1/categories/',params={'title': name})
+    logger.info(response.status_code)
+    logger.info(response.text)
+    return response.json()
 
 def post_product(uid,product):
     new_product = {
@@ -73,16 +61,13 @@ def add_product(update, context):
         return
     category_name = message[1]
     product = ' '.join(message[2:])
-    categories = get_category_by_name(category_name)
+    categories = get_categories_by_name(category_name)
     # добавляем продукт в словарь
     # FIXME: написать елиф для 2х и более категорий
     if not categories:
         update.message.reply_text(f'Категории "{category_name}" нет')
     elif len(categories) > 1:
-        names = []
-        for category in categories:
-            if category_name in category['title']:
-                names.append(category['title'])
+        names = [category['title'] for category in categories]
         update.message.reply_text(f'Вот список категорий: {names} выберите нужную')
     else:
         post = post_product(categories[0]['id'], product)
