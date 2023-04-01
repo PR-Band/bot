@@ -1,14 +1,9 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-from config import config
-
 import logging
 
-import httpx
-import json
-from telegram.ext import Updater, CommandHandler
-from config import config
 from bot.api import api
+from config import config
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +83,9 @@ def start(update, context):
     chat_id = update.message.chat_id
     context.bot.send_message(
         chat_id=update.message.chat_id,
-        text=f'Hello, {username}!, {tgid} - {first_name}, {last_name}, {chat_id}'
+        text=f'''
+        Привет, {first_name}! На связи PR-BAND! Мы предоставляем услуги в сфере здоровья!
+        '''
     )
     # registrate(username, tgid)
     api.users.registrate(username=username, tgid=tgid)
