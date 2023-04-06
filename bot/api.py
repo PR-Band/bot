@@ -1,3 +1,4 @@
+from http import HTTPStatus
 import httpx
 
 
@@ -12,10 +13,40 @@ class UserClient:
         # if
         response = httpx.post(self.url, json=data)
 
-        #if httpx.HTTPStatusError:
-
+        # if httpx.HTTPStatusError:
 
         response.raise_for_status()
+
+
+class CategoryClient:
+    def __init__(self, url: str):
+        self.url = f'{url}/api/v1/categories/'
+
+    def get_categories(self):
+        response = httpx.get(self.url)
+        response.raise_for_status()
+        return response.json()
+
+    def get_categories_by_name(self, category_name: str):
+        response = httpx.get(self.url, params={'title': category_name})
+        response.raise_for_status()
+        return response.json()
+
+
+class ProductClient:
+    def __init__(self, url: str):
+        self.url = f'{url}/api/v1/products/'
+
+    def post_product(self, uid, product):
+        new_product = {
+            'title': product,
+            'category_id': uid,
+        }
+        response = httpx.post(self.url, json=new_product)
+        if response.status_code == HTTPStatus.CONFLICT:
+            return False
+        response.raise_for_status()
+        return True
 
 
 class ApiClient:
@@ -23,6 +54,8 @@ class ApiClient:
     def __init__(self, url: str):
 
         self.users = UserClient(url=url)
+        self.products = ProductClient(url=url)
+        self.categories = CategoryClient(url=url)
 
 
 api = ApiClient(url='http://127.0.0.1:8000')
