@@ -1,3 +1,4 @@
+from http import HTTPStatus
 import httpx
 
 
@@ -23,22 +24,13 @@ class CategoryClient:
 
     def get_categories(self):
         response = httpx.get(self.url)
-        # logger.info(response.status_code)
-        # logger.info(response.text)
+        response.raise_for_status()
         return response.json()
 
     def get_categories_by_name(self, category_name: str):
-        categories_duble = []
-        categories_all = api.categories.get_categories()
-        for category in categories_all:
-            if category_name in category['title']:
-                categories_duble.append(category)
-        return categories_duble
-# str36
-# response = httpx.get(self.url, params={'title': category_name})
-# logger.info(response.status_code)
-# logger.info(response.text)
-# return response.json()
+        response = httpx.get(self.url, params={'title': category_name})
+        response.raise_for_status()
+        return response.json()
 
 
 class ProductClient:
@@ -51,10 +43,9 @@ class ProductClient:
             'category_id': uid,
         }
         response = httpx.post(self.url, json=new_product)
-        # logger.info(response.status_code)
-        # logger.info(response.json())
-        if response.status_code == 409:
+        if response.status_code == HTTPStatus.CONFLICT:
             return False
+        response.raise_for_status()
         return True
 
 

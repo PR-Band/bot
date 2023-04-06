@@ -1,7 +1,7 @@
 import logging
 
 from bot.api import api
-from bot.errors import DubleDBProductError, EmptyDBError, IncorrectAddCmdError, DubleDBCategoriesError
+from bot.errors import IncorrectAddCmdError
 
 logger = logging.getLogger(__name__)
 
@@ -18,16 +18,20 @@ def get_category_product(cmd: str) -> tuple[str, str]:
     return category_name, product
 
 
-def add_product(cmd: str):
-    category_name, product = get_category_product(cmd)
+def add_product(cmd: str) -> str:
+    try:
+        category_name, product = get_category_product(cmd)
+    except IncorrectAddCmdError as err:
+        return err.message
     categories = api.categories.get_categories_by_name(category_name=category_name)
     if not categories:
-        raise EmptyDBError(f'Категории `{category_name}` нет')
+        return f'Категории `{category_name}` нет'
     elif len(categories) > 1:
         names = [category['title'] for category in categories]
-        raise DubleDBCategoriesError(f'выберите нужную категорию из списка: `{names}`')
+        return f'выберите нужную категорию из списка: `{names}`'
     else:
         post = api.products.post_product(categories[0]['id'], product)
         if not post:
-            raise DubleDBProductError('В категории уже есть такой продукт')
-    return categories[0]['title'], product
+            return 'В категории уже есть такой продукт'
+    category_title = categories[0]['title']
+    return f'продукт `{product}` добавлен в категорию `{category_title}`'

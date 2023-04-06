@@ -4,14 +4,9 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from telegram.ext import CommandHandler, Updater
 
 from bot.api import api
-from bot.errors import (
-    DubleDBCategoriesError,
-    DubleDBProductError,
-    EmptyDBError,
-    IncorrectAddCmdError,
-)
+from bot.config import config
+from bot.errors import IncorrectAddCmdError
 from bot.products import add_product
-from config import config
 
 # MessageHandler, Filters
 logger = logging.getLogger(__name__)
@@ -24,17 +19,11 @@ jenv = Environment(
 
 def add_product_in_handlers(update, context):
     try:
-        category, product = add_product(update.message.text)
+        message = add_product(update.message.text)
     except IncorrectAddCmdError as err:
         update.message.reply_text(err.message, parse_mode='MarkdownV2')
-    except EmptyDBError as err:
-        update.message.reply_text(err.message, parse_mode='MarkdownV2')
-    except DubleDBCategoriesError as err:
-        update.message.reply_text(f'{err.message}', parse_mode='MarkdownV2')
-    except DubleDBProductError as err:
-        update.message.reply_text(err.message, parse_mode='MarkdownV2')
     update.message.reply_text(
-        f'продукт `{product}` добавлен в категорию `{category}`',
+        message,
         parse_mode='MarkdownV2',
     )
 
