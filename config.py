@@ -12,3 +12,15 @@ def load():
 
 
 config = load()
+
+
+@dataclass
+class ConfigApi:
+    http_key: str
+
+
+def load_api():
+    return ConfigApi(http_key=os.environ['HTTP_KEY'])
+
+
+config_api = load_api()
