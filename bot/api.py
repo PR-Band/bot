@@ -32,6 +32,11 @@ class CategoryClient:
         response.raise_for_status()
         return response.json()
 
+    def search_categories_by_name(self, category_name: str):
+        response = httpx.get(self.url, params={'search': category_name})
+        response.raise_for_status()
+        return response.json()
+
 
 class ProductClient:
     def __init__(self, url: str):
