@@ -67,7 +67,10 @@ class ScheduleTemplateClient:
             'end_slot': end_slot,
         }
         response = httpx.post(self.url, json=new_schedule_templates)
+        if response.status_code == HTTPStatus.CONFLICT:
+            return False
         response.raise_for_status()
+        return True
 
 
 class ApiClient:
