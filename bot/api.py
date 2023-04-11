@@ -54,6 +54,25 @@ class ProductClient:
         return True
 
 
+class ScheduleTemplateClient:
+    def __init__(self, url: str):
+        self.url = f'{url}/api/v1/schedule_templates/'
+
+    def post_schedule_templates(self, day, start_slot, end_slot, uid, product_id):
+        new_schedule_templates = {
+            'id': uid,
+            'product_id': product_id,
+            'day': day,
+            'start_slot': start_slot,
+            'end_slot': end_slot,
+        }
+        response = httpx.post(self.url, json=new_schedule_templates)
+        if response.status_code == HTTPStatus.CONFLICT:
+            return False
+        response.raise_for_status()
+        return True
+
+
 class ApiClient:
 
     def __init__(self, url: str):
@@ -61,6 +80,7 @@ class ApiClient:
         self.users = UserClient(url=url)
         self.products = ProductClient(url=url)
         self.categories = CategoryClient(url=url)
+        self.scheduletemplate = ScheduleTemplateClient(url=url)
 
 
 api = ApiClient(url='http://127.0.0.1:8000')
