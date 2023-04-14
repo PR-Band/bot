@@ -18,14 +18,18 @@ def get_category_product(cmd: str) -> tuple[str, str]:
     return category_name, product
 
 
-def add_product(category_name, product) -> str:
+def add_product(category_name, product, user) -> str:
     categories = api.categories.search_categories_by_name(category_name=category_name)
     if len(categories) > 1:
         names = [category['title'] for category in categories]
         return f'выберите нужную категорию из списка: `{names}`'
     elif not categories:
         return f'Категории `{category_name}` нет'
-    post = api.products.post_product(categories[0]['id'], product)
+    post = api.products.post_product(
+        uid=categories[0]['id'],
+        product=product,
+        user_id=user['id'],
+    )
     if not post:
         return 'В категории уже есть такой продукт'
     category_title = categories[0]['title']

@@ -1,21 +1,30 @@
 from http import HTTPStatus
+
 import httpx
 
 
-# try, except  HTTPStatusError: Client error '409 CONFLICT'
 class UserClient:
     def __init__(self, url: str):
         self.url = f'{url}/api/v1/users/'
 
-    def registrate(self, username: str, tgid: int) -> None:
+    def registrate(self, username: str, tgid: int):
 
         data = {'tgid': tgid, 'username': username}
-        # if
         response = httpx.post(self.url, json=data)
-
-        # if httpx.HTTPStatusError:
-
+        if response.status_code == HTTPStatus.CONFLICT:
+            return False
         response.raise_for_status()
+        return True
+
+    def get_by_tgid(self, tgid: int):
+        response = httpx.get(f'{self.url}telegram/{tgid}')
+        response.raise_for_status()
+        return response.json()
+
+    def get_products(self, user_id: int):
+        response = httpx.get(f'{self.url}{user_id}/products/')
+        response.raise_for_status()
+        return response.json()
 
 
 class CategoryClient:
@@ -42,10 +51,11 @@ class ProductClient:
     def __init__(self, url: str):
         self.url = f'{url}/api/v1/products/'
 
-    def post_product(self, uid, product):
+    def post_product(self, uid, product, user_id):
         new_product = {
             'title': product,
             'category_id': uid,
+            'user_id': user_id,
         }
         response = httpx.post(self.url, json=new_product)
         if response.status_code == HTTPStatus.CONFLICT:

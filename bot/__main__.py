@@ -3,7 +3,13 @@ import logging
 from telegram.ext import CommandHandler, Updater
 
 from bot.config import config
-from bot.handlers import add_product_in_handlers, add_slot, choose_category, start
+from bot.handlers import (
+    add_product_in_handlers,
+    add_slot,
+    choose_category,
+    get_products_in_handlers,
+    start,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +23,7 @@ def main():
     dp.add_handler(CommandHandler('choose', choose_category))
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('addslot', add_slot))
+    dp.add_handler(CommandHandler('getproducts', get_products_in_handlers))
     updater.start_polling()
 
 
