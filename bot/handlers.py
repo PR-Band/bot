@@ -26,7 +26,9 @@ def choose_category(update, context):
     categories = api.categories.get_categories_by_name(category_name)
     category = categories[0]
     product = context.user_data.get('product_name')
-    post = api.products.post_product(category['id'], product)
+    user = api.users.get_by_tgid(tgid=update.effective_user.id)
+    context.user_data['user']=user
+    post = api.products.post_product(category['id'], product, user)
     if not post:
         update.message.reply_text('В категории уже есть такой продукт')
         return
@@ -37,6 +39,17 @@ def choose_category(update, context):
     )
 
 
+def get_products_in_handlers(update, context):
+    user = context.user_data.get('user')
+    if not user:
+        user = api.users.get_by_tgid(tgid=update.effective_user.id)
+    products = api.users.get_products(user['id'])
+
+    # message = f'Список услуг мастера: {products} '
+    template = jenv.get_template('products.j2')
+    message = template.render(products=products)
+    update.message.reply_text(message, parse_mode='MarkdownV2')
+
 def add_product_in_handlers(update, context):
     cmd = update.message.text
     try:
@@ -45,8 +58,9 @@ def add_product_in_handlers(update, context):
         update.message.reply_text(err.message)
         return
 
+    user = api.users.get_by_tgid(tgid=update.effective_user.id)
     context.user_data['product_name'] = product
-    message = add_product(category_name, product)
+    message = add_product(category_name, product, user)
 
     update.message.reply_text(
         message,
@@ -71,13 +85,20 @@ def start(update, context):
 def add_slot(update, context):
     cmd = update.message.text
     day, start_slot, end_slot = parse_day_start_end(cmd)
+
+    user = context.user_data.get('user')
+    if not user:
+        user = api.users.get_by_tgid(tgid=update.effective_user.id)
+    products = api.users.get_products(user['id'])
+
     post_schedule_templates = api.scheduletemplate.post_schedule_templates(
         day=day,
         start_slot=start_slot,
         end_slot=end_slot,
-        uid=1,
-        product_id=1,
+        uid=user['id'],
+        product_id=products[0]['id'],
     )
+
     if not post_schedule_templates:
         update.message.reply_text(
             f'Слот `c {start_slot} до {end_slot}` уже занят',
