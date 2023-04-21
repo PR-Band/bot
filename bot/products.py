@@ -22,7 +22,7 @@ def add_product(category_name, product, user) -> str:
     categories = api.categories.search_categories_by_name(category_name=category_name)
     if len(categories) > 1:
         names = [category['title'] for category in categories]
-        return f'выберите нужную категорию из списка: `{names}`'
+        return f'введи команду /choose и выбери нужную категорию из списка: `{names}`'
     elif not categories:
         return f'Категории `{category_name}` нет'
     post = api.products.post_product(

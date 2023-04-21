@@ -27,7 +27,7 @@ def choose_category(update, context):
     category = categories[0]
     product = context.user_data.get('product_name')
     user = api.users.get_by_tgid(tgid=update.effective_user.id)
-    context.user_data['user']=user
+    context.user_data['user'] = user
     post = api.products.post_product(category['id'], product, user)
     if not post:
         update.message.reply_text('В категории уже есть такой продукт')
@@ -45,10 +45,10 @@ def get_products_in_handlers(update, context):
         user = api.users.get_by_tgid(tgid=update.effective_user.id)
     products = api.users.get_products(user['id'])
 
-    # message = f'Список услуг мастера: {products} '
     template = jenv.get_template('products.j2')
     message = template.render(products=products)
     update.message.reply_text(message, parse_mode='MarkdownV2')
+
 
 def add_product_in_handlers(update, context):
     cmd = update.message.text
@@ -82,6 +82,14 @@ def start(update, context):
     api.users.registrate(username=username, tgid=tgid)
 
 
+def get_categories_in_handlers(update, context):
+    categories = api.categories.get_categories()
+    update.message.reply_text(
+        f'Имеющиеся категории: `{categories}`',
+        parse_mode='MarkdownV2',
+    )
+
+
 def add_slot(update, context):
     cmd = update.message.text
     day, start_slot, end_slot = parse_day_start_end(cmd)
@@ -108,4 +116,13 @@ def add_slot(update, context):
     update.message.reply_text(
         f'Слот `{day} c {start_slot} до {end_slot}` добавлен',
         parse_mode='MarkdownV2',
+    )
+
+
+def get_slot(update, context):
+    cmd = update.message.text
+    date = cmd.split(' ')
+    date = date[1]
+    update.message.reply_text(
+        'Расписание на когда-то будет'
     )
