@@ -84,8 +84,9 @@ def start(update, context):
 
 def get_categories_in_handlers(update, context):
     categories = api.categories.get_categories()
+    categories_title = [category['title'] for category in categories]
     update.message.reply_text(
-        f'Имеющиеся категории: `{categories}`',
+        f'Имеющиеся категории: `{categories_title}`',
         parse_mode='MarkdownV2',
     )
 
