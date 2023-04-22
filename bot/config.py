@@ -10,7 +10,11 @@ class Config:
 
 
 def load():
-    return Config(api_key=os.environ['API_KEY'], http_key=os.environ['HTTP_KEY'], log_level=os.environ['LOG_LEVEL'],)
+    return Config(
+        api_key=os.environ['API_KEY'],
+        http_key=os.environ['HTTP_KEY'],
+        log_level=os.environ['LOG_LEVEL'],
+    )
 
 
 config = load()

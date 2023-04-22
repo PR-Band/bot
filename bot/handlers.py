@@ -119,10 +119,28 @@ def add_slot(update, context):
     )
 
 
-def get_slot(update, context):
+def add_slots_by_day(update, context):
     cmd = update.message.text
     date = cmd.split(' ')
     date = date[1]
+
+    user = context.user_data.get('user')
+    if not user:
+        user = api.users.get_by_tgid(tgid=update.effective_user.id)
+    products = api.users.get_products(user['id'])
+
+    post_slots = api.products.post_slot(
+        day=date,
+        product_id=products[0]['id'],
+    )
+
+    if not post_slots:
+        update.message.reply_text(
+            'Слотов нет',
+            parse_mode='MarkdownV2',
+        )
+        return
     update.message.reply_text(
-        'Расписание на когда-то будет'
+        f'Слот на `{date}` добавлен',
+        parse_mode='MarkdownV2',
     )
