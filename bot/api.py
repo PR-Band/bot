@@ -63,6 +63,16 @@ class ProductClient:
         response.raise_for_status()
         return True
 
+    def post_slot(self, product_id, day):
+        new_slot = {
+            'day': day,
+        }
+        response = httpx.post(f'{self.url}{product_id}/slots/', json=new_slot)
+        if response.status_code == HTTPStatus.CONFLICT:
+            return False
+        response.raise_for_status()
+        return True
+
 
 class ScheduleTemplateClient:
     def __init__(self, url: str):
